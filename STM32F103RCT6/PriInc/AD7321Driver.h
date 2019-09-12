@@ -8,7 +8,9 @@
 #ifndef AD7321DRIVER_H_
 #define AD7321DRIVER_H_
 
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
+
 
 
 // add the header file here
