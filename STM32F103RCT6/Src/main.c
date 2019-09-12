@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -67,6 +68,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+	unsigned int value;
   /* USER CODE END 1 */
   
 
@@ -88,7 +90,13 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+  /*************Configure CONTROL_REGISTER*******************/
+  AD7321_read_write(CONTROL_REGISTER | ADD0_VIN0 | SINGLE_ENDED | NORMAL_MODE | SEQUENCER_NOT_USED | TWOS_COMPLEMENT_CODING | INTERNAL_REF);
+  /*************Configure RANGE_REGISTER*******************/
+  AD7321_read_write(RANGE_REGISTER | VIN0_5V);
+
 
   /* USER CODE END 2 */
 
@@ -97,7 +105,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  value = AD7321_read_write(CONVENTION);
+		HAL_Delay(1000);
+//	  printf("helloworld\r\n");
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

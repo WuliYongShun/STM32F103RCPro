@@ -9,18 +9,23 @@
 #include "AD7321Driver.h"
 
 /* MACROS  ------------------------------------------------------------------ */
-#define LowCs()		HAL_GPIO_WritePin(SPI1CS_GPIO_Port, SPI1CS_Pin, GPIO_PIN_RESET)
-#define HighCs()	HAL_GPIO_WritePin(SPI1CS_GPIO_Port, SPI1CS_Pin, GPIO_PIN_SET)
+#define CsLow()				HAL_GPIO_WritePin(SPI1CS_GPIO_Port, SPI1CS_Pin, GPIO_PIN_RESET)
+#define CsHigh()			HAL_GPIO_WritePin(SPI1CS_GPIO_Port, SPI1CS_Pin, GPIO_PIN_SET)
 
-#define ClkLow()	HAL_GPIO_WritePin(SPI1SCK_GPIO_Port, SPI1SCK_Pin, GPIO_PIN_RESET)
-#define ClikHigh()	HAL_GPIO_WritePin(SPI1SCK_GPIO_Port, SPI1SCK_Pin, GPIO_PIN_SET)
+#define ClkLow()			HAL_GPIO_WritePin(SPI1SCK_GPIO_Port, SPI1SCK_Pin, GPIO_PIN_RESET)
+#define ClikHigh()			HAL_GPIO_WritePin(SPI1SCK_GPIO_Port, SPI1SCK_Pin, GPIO_PIN_SET)
 
-#define DoutLow()	HAL_GPIO_WritePin(SPI1MOSI_GPIO_Port, SPI1MOSI_Pin, GPIO_PIN_RESET)
-#define DoutHigh() 	HAL_GPIO_WritePin(SPI1MOSI_GPIO_Port, SPI1MOSI_Pin, GPIO_PIN_SET)
+#define DoutLow()			HAL_GPIO_WritePin(SPI1MOSI_GPIO_Port, SPI1MOSI_Pin, GPIO_PIN_RESET)
+#define DoutHigh() 			HAL_GPIO_WritePin(SPI1MOSI_GPIO_Port, SPI1MOSI_Pin, GPIO_PIN_SET)
 
-#define DinRead()	HAL_GPIO_ReadPin(SPI1MISO_GPIO_Port, SPI1MISO_Pin)
+#define DinRead()			HAL_GPIO_ReadPin(SPI1MISO_GPIO_Port, SPI1MISO_Pin)
 #define read_spi_di_HIGH 	1
 
+#define set_spi_cs()		CsLow()
+#define clr_spi_cs()		CsHigh()
+
+#define set_spi_clk()		ClkLow()
+#define clr_spi_clk()		ClikHigh()
 
 #define set_spi_mosi()		DoutLow()
 #define clr_spi_mosi()		DoutHigh()
@@ -89,6 +94,7 @@ unsigned int AD7321_read_write(unsigned int spi_mosiValue)
 	set_spi_cs();
 
 	return  (spi_misoValue & 0x0000FFFF);
+	
 
 }
 

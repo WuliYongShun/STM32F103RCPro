@@ -48,6 +48,6 @@
 #define	VIN1_2_5V			0x100
 #define	VIN1_0_10V			0x180
 
-unsigned int AD7321_read_write(unsigned int );
+unsigned int AD7321_read_write(unsigned int spi_mosiValue);
 
 #endif /* AD7321DRIVER_H_ */
