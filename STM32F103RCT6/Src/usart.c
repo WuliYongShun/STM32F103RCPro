@@ -23,30 +23,30 @@
 /* USER CODE BEGIN 0 */
 //#include <stdio.h>
 
-//#ifdef __GNUC__
+#ifdef __GNUC__
 
-//#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 
-//PUTCHAR_PROTOTYPE
-//{
-//	//使用串口1
-//	HAL_UART_Transmit(&huart1, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
+PUTCHAR_PROTOTYPE
+{
+	//使用串口1
+	HAL_UART_Transmit(&huart1, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
 
-//	return ch;
-//}
+	return ch;
+}
 
-//#endif
+#endif
 
-//int _write(int file, char *ptr,int len)
-//{
-//	int DataIdx;
+int _write(int file, char *ptr,int len)
+{
+	int DataIdx;
 
-//	for(DataIdx = 0;DataIdx < len;DataIdx++)
-//	{
-//		 __io_putchar(*ptr++);
-//	}
-//	return len;
-//}
+	for(DataIdx = 0;DataIdx < len;DataIdx++)
+	{
+		 __io_putchar(*ptr++);
+	}
+	return len;
+}
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;

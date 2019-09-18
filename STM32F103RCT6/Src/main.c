@@ -106,8 +106,9 @@ int main(void)
   {
     /* USER CODE END WHILE */
 	  value = AD7321_read_write(CONVENTION);
-		HAL_Delay(1000);
-//	  printf("helloworld\r\n");
+	  HAL_Delay(1000);
+	  printf("helloworld\r\n");
+	  printf("%d\r\n", value);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
