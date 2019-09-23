@@ -105,7 +105,7 @@ static void IIC_Ack(uint8_t ack)
 	IIC_SdaOut();
 	IIC_Delay(DELAY_TIME);
 
-	/* 判断ack：如果为sda输出高，如果为true输出为低 */
+	/* 判断ack：如果为0 sda输出高，如果为1 sda输出为低 */
 	if(ack)
 	{
 		IIC_ResetSda();
@@ -193,12 +193,12 @@ uint8_t IIC_SendByte(uint8_t Data)
 
 /**
  * @brief  IIC从芯片接收一个字节数据
- * @param  none
+ * @param  ack:为0时产生非应答信号，为1时产生应答信号
  * @return none
  */
-uint8_t IIC_RecByte(void)
+uint8_t IIC_RecByte(uint8_t ack)
 {
-	uint8_t 8;
+	uint8_t i;
 	uint8_t receive = 0x00;
 	uint8_t tempsda = 0;
 
@@ -207,11 +207,56 @@ uint8_t IIC_RecByte(void)
 	IIC_Sda_In();
 	for(i =0; i < 8; i++)
 	{
-		receive << 1;
+		receive <<= 1;
+		IIC_ResetScl();
+		IIC_Delay(DELAY_TIME);
 
-		receive = IIC_Sda_In();
+		tempsda = IIC_ReadSda();
+		if(tempsda )
+		{
+			receive |= 0x01;
+		}
+		IIC_Delay(DELAY_TIME);
 
+		IIC_SetScl();
+		IIC_Delay(DELAY_TIME);
 	}
+	IIC_ResetScl();
+	IIC_SdaOut();
 
+	IIC_Ack(ack);
+	return receive;
 }
+
+/**
+ * @brief  在HDC1080指定地址写入一个数据
+ * @param[in]  WriteAddr  :写入数据的目的地址
+ * @param[in]  DataToWrite:要写入的数据
+ * @return None
+ */
+void HDC1080_WriteOneByte(uint8_t WriteAddr,uint32_t DataToWrite)
+{
+  IIC_Start();
+
+  IIC1_Send_Byte(0X80);    //发送器件地址0XA0,写数据
+  IIC1_Wait_Ack();
+  IIC1_Send_Byte(WriteAddr);   //发送低地址
+  IIC1_Wait_Ack();
+
+  IIC1_Send_Byte(DataToWrite>>8);     //发送字节
+  IIC1_Wait_Ack();
+  IIC1_Send_Byte(DataToWrite&0xff);     //发送字节
+  IIC1_Wait_Ack();
+
+  IIC1_Stop();//产生一个停止条件
+
+  SYSExitCritical();////_EINT();       //开总中断
+}
+
+/***************************************************************************
+*函数名：T8563_SendData
+*参  数：SlvAdr 从机地址    SubAdr从机寄存器地址
+*返回值：无
+*描  述：向指定芯片的指定地址  发送ByteCnt个数据
+*/
 

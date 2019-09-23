@@ -587,7 +587,7 @@ Discarded input sections
  .data          0x00000000        0x0 PriSrc\HDC1080.o
  .bss           0x00000000        0x0 PriSrc\HDC1080.o
  .text.IIC_Delay
-                0x00000000       0x20 PriSrc\HDC1080.o
+                0x00000000       0x34 PriSrc\HDC1080.o
  .text.IIC1_Init
                 0x00000000        0xc PriSrc\HDC1080.o
  .text.HDC1080_Init
@@ -599,15 +599,19 @@ Discarded input sections
  .text.IIC_Ack  0x00000000       0x24 PriSrc\HDC1080.o
  .text.IIC_GetAck
                 0x00000000       0x3c PriSrc\HDC1080.o
- .debug_info    0x00000000      0x22d PriSrc\HDC1080.o
- .debug_abbrev  0x00000000      0x13d PriSrc\HDC1080.o
+ .text.IIC_SendByte
+                0x00000000       0x42 PriSrc\HDC1080.o
+ .text.IIC_RecByte
+                0x00000000       0x66 PriSrc\HDC1080.o
+ .debug_info    0x00000000      0x2bd PriSrc\HDC1080.o
+ .debug_abbrev  0x00000000      0x177 PriSrc\HDC1080.o
  .debug_aranges
-                0x00000000       0x50 PriSrc\HDC1080.o
- .debug_ranges  0x00000000       0x40 PriSrc\HDC1080.o
- .debug_line    0x00000000      0x24e PriSrc\HDC1080.o
- .debug_str     0x00000000      0x2e4 PriSrc\HDC1080.o
+                0x00000000       0x60 PriSrc\HDC1080.o
+ .debug_ranges  0x00000000       0x50 PriSrc\HDC1080.o
+ .debug_line    0x00000000      0x2ad PriSrc\HDC1080.o
+ .debug_str     0x00000000      0x317 PriSrc\HDC1080.o
  .comment       0x00000000       0x7d PriSrc\HDC1080.o
- .debug_frame   0x00000000       0xf4 PriSrc\HDC1080.o
+ .debug_frame   0x00000000      0x13c PriSrc\HDC1080.o
  .ARM.attributes
                 0x00000000       0x33 PriSrc\HDC1080.o
  .text          0x00000000        0x0 Src\gpio.o
