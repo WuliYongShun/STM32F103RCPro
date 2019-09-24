@@ -4,10 +4,26 @@
  *  Created on: 2019年9月17日
  *      Author: S
  */
+
+/**
+  ******************************************************************************
+  *               Copyright(C) 2018-2028 GDKY All Rights Reserved
+  *
+  * @file     HDC1080.c
+  * @author   Shun
+  * @version  V1.00
+  * @date     17-September-2019
+  * @brief    template.
+  ******************************************************************************
+  * @history
+  */
+
 #define    HDC1080_GLOBALS
+/* INCLUDES ----------------------------------------------------------------- */
+
 #include "HDC1080.h"
 
-
+/* TYPEDEFS ----------------------------------------------------------------- */
 
 /* MACROS  ------------------------------------------------------------------ */
 
@@ -16,10 +32,23 @@
 #define    TEMPTURE_ADDR	0x00	/* HDC1080读取温度地址 */
 #define    HUMDOITY_ADDR	0x01	/* HDC1080读取湿度地址 */
 
+/* CONSTANTS  --------------------------------------------------------------- */
+
+/* GLOBAL VARIABLES --------------------------------------------------------- */
+
+/* GLOBAL FUNCTIONS --------------------------------------------------------- */
+
 /* LOCAL VARIABLES ---------------------------------------------------------- */
 
 static int16_t s_i16TempVal    = 0;//温度值，单位：0.01℃
 static uint8_t s_u8HumidityVal = 0;//湿度值，单位：%， 1-100.
+
+/* LOCAL FUNCTIONS ---------------------------------------------------------- */
+
+
+
+
+
 
 /**
  * @brief  HDC1080us延时函数
@@ -342,9 +371,10 @@ void HDC1080_UpdateTemperature(void)
 
 	temperature = HDC1080_ReadByte(DEVICE_ADDR, TEMPTURE_ADDR);
 
-	if((temperature != 0xffff) | (temperature != 0))
+	if((temperature != 0xffff) || (temperature != 0))
 	{
 		/* 0不能做除数，直接返回0 */
+		temperature = 0;
 	}
 	else
 	{
@@ -364,4 +394,26 @@ void HDC1080_UpdateTemperature(void)
 	}
 }
 
+/**
+ * @brief  update temperature
+ * @param  None
+ * @return None
+ */
+void HDC1080_UpdateHumdity(void)
+{
+	float f_humidity;
+	uint32_t humidity;
 
+	humidity = HDC1080_ReadByte(DEVICE_ADDR, HUMDOITY_ADDR);	//设备地址0x80, 寄存器地址0x01,读取湿度
+
+	if((humidity != 0xffff) || (humidity != 0))
+	{
+		/* 湿度为0时，不能做除数，直接返回0 */
+		humidity = 0;
+	}
+	else
+	{
+		f_humidity = (float)humidity;
+		s_u8HumidityVal = (uint8_t)(f_humidity / 0xffff * 100);	//计算湿度值
+	}
+}

@@ -32,7 +32,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "AD7321Driver.h"
+//#include "AD7321Driver.h"
 
 /* USER CODE END Includes */
 
