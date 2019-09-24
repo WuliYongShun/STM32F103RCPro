@@ -4,25 +4,48 @@
  *  Created on: 2019年9月17日
  *      Author: S
  */
-#define   HDC1080_GLOBALS
+#define    HDC1080_GLOBALS
 #include "HDC1080.h"
 
-#define  DELAY_TIME  10 /* 延时周期统一控制 */
+
+
+/* MACROS  ------------------------------------------------------------------ */
+
+#define    DELAY_TIME  		10 		/* 延时周期统一控制 */
+#define    DEVICE_ADDR		0x80	/* HDC1080设备地址 */
+#define    TEMPTURE_ADDR	0x00	/* HDC1080读取温度地址 */
+#define    HUMDOITY_ADDR	0x01	/* HDC1080读取湿度地址 */
+
+/* LOCAL VARIABLES ---------------------------------------------------------- */
+
+static int16_t s_i16TempVal    = 0;//温度值，单位：0.01℃
+static uint8_t s_u8HumidityVal = 0;//湿度值，单位：%， 1-100.
 
 /**
- * @brief  HDC1080简单us延时函数
- * @param[in]  num:延时周期数
+ * @brief  HDC1080us延时函数
+ * @param[in]  time:延时周期数
  * @return None
  */
-static void IIC_Delay(uint16_t time)
+static void IIC_Delay(uint16_t num)
 {
-	uint16_t i = 0;
+	delay_us(num);
+//	uint16_t i = 0;
+//
+//	while(time--)
+//	{
+//		i = 10;
+//		while(i--);
+//	}
+}
 
-	while(time--)
-	{
-		i = 10;
-		while(i--);
-	}
+/**
+ * @brief  HDC1080ms延时函数
+ * @param[in]  time:延时周期数
+ * @return None
+ */
+static void IIC_DelayMs(uint16_t num)
+{
+	delay_ms(num);
 }
 
 /**
@@ -30,9 +53,10 @@ static void IIC_Delay(uint16_t time)
  * @param  None
  * @return None
  */
-static void IIC1_Init(void)
+static void IIC_Init(void)
 {
 	/* iic硬件初始化 */
+
 }
 
 /**
@@ -43,7 +67,7 @@ static void IIC1_Init(void)
 uint8_t HDC1080_Init(void)
 {
 	/* iic初始化 */
-	IIC1_Init();
+	IIC_Init();
 }
 
 /**
@@ -165,7 +189,7 @@ uint8_t IIC_SendByte(uint8_t Data)
 {
 	uint8_t i;
 	IIC_SdaOut();
-	for(i = 0; i < 8; i++)
+	for(i = 0; i < 8; i++)	//1Byte = 8Bit
 	{
 		IIC_ResetScl();
 		IIC_Delay(DELAY_TIME);
@@ -178,11 +202,10 @@ uint8_t IIC_SendByte(uint8_t Data)
 		{
 			IIC_ResetSda();
 		}
-		Data << 1;
+		Data <<= 1;
 
 		IIC_Delay(DELAY_TIME);
 		IIC_SetScl();
-		IIC_Delay(DELAY_TIME);
 		IIC_Delay(DELAY_TIME);
 	}
 	IIC_ResetScl();
@@ -196,7 +219,7 @@ uint8_t IIC_SendByte(uint8_t Data)
  * @param  ack:为0时产生非应答信号，为1时产生应答信号
  * @return none
  */
-uint8_t IIC_RecByte(uint8_t ack)
+uint8_t IIC_ReadByte(uint8_t ack)
 {
 	uint8_t i;
 	uint8_t receive = 0x00;
@@ -234,29 +257,111 @@ uint8_t IIC_RecByte(uint8_t ack)
  * @param[in]  DataToWrite:要写入的数据
  * @return None
  */
-void HDC1080_WriteOneByte(uint8_t WriteAddr,uint32_t DataToWrite)
+void HDC1080_WriteByte(uint8_t DevAddr, uint8_t RegAddr,uint32_t WriteValue)
 {
-  IIC_Start();
+	/* msp430确定程序执行，需要关总中断 */
 
-  IIC1_Send_Byte(0X80);    //发送器件地址0XA0,写数据
-  IIC1_Wait_Ack();
-  IIC1_Send_Byte(WriteAddr);   //发送低地址
-  IIC1_Wait_Ack();
+	IIC_Start();
 
-  IIC1_Send_Byte(DataToWrite>>8);     //发送字节
-  IIC1_Wait_Ack();
-  IIC1_Send_Byte(DataToWrite&0xff);     //发送字节
-  IIC1_Wait_Ack();
+	IIC_SendByte(DevAddr);	//HDC1080 设备地址
+	IIC_GetAck();
 
-  IIC1_Stop();//产生一个停止条件
+	IIC_SendByte(RegAddr);	//HDC1080 寄存器地址
+	IIC_GetAck();
 
-  SYSExitCritical();////_EINT();       //开总中断
+	IIC_SendByte((WriteValue >> 8) & 0xff);	//发送高8位配置信息
+	IIC_GetAck();
+	IIC_SendByte(WriteValue & 0xff);	//发送低8位配置信息
+	IIC_GetAck();
+
+	IIC_stop();	//产生一个停止条件
+
+	/* msp430确定程序执行完成后，关闭全局中断 */
+
 }
 
-/***************************************************************************
-*函数名：T8563_SendData
-*参  数：SlvAdr 从机地址    SubAdr从机寄存器地址
-*返回值：无
-*描  述：向指定芯片的指定地址  发送ByteCnt个数据
-*/
+/**
+ * @brief  在HDC1080指定地址读出一个数据
+ * @param[in]  DevAddr:设置地址
+ * @param[in]  ReadAddr:开始读数的地址
+ * @return 读到的数据
+ */
+uint32_t HDC1080_ReadByte(uint8_t DevAddr, uint8_t RegAddr)
+{
+	uint8_t tempdata;
+	uint32_t readdata;
+
+	/* msp430中断操作 */
+
+	IIC_Start();	//iic开启
+
+	IIC_SendByte(DevAddr);	//写入设备地址0x80
+	IIC_GetAck();
+
+	IIC_SendByte(RegAddr);	//写入寄存器地址
+	IIC_GetAck();
+
+	IIC_stop();	//iic关闭
+
+	IIC_DelayMs(15);	//等待转换完毕
+
+	IIC_Start();
+	IIC_SendByte(DevAddr | 0x01);
+
+	/* 应答不成功，返回oxffff*/
+	if(IIC_GetAck() != 0)
+	{
+		readdata = 0xffff;
+
+		/* msp430开总中断 */
+
+		return readdata;
+	}
+
+	tempdata = IIC_ReadByte(1);	//读取并产生应答信号
+	readdata = IIC_ReadByte(0);	//读取不产生应答信号
+
+	IIC_stop();
+
+	readdata = (readdata << 8) | tempdata;
+
+	/* msp430开总中断 */
+
+	return readdata;
+}
+
+/**
+ * @brief  update temperature
+ * @param  None
+ * @return None
+ */
+void HDC1080_UpdateTemperature(void)
+{
+    float f_temperture;
+	uint32_t temperature;	//温度
+
+	temperature = HDC1080_ReadByte(DEVICE_ADDR, TEMPTURE_ADDR);
+
+	if((temperature != 0xffff) | (temperature != 0))
+	{
+		/* 0不能做除数，直接返回0 */
+	}
+	else
+	{
+		s_i16TempVal = ((temperature * 16500 / 0xffff) - 4000); //计算温度值,单位：0.01℃。
+	}
+
+	//温度限制 -10----85度
+	if((s_i16TempVal > -1000)||(s_i16TempVal<8500))
+	{
+		/* 错误标识 */
+
+	}
+	else
+	{
+		/* 正确标识 */
+
+	}
+}
+
 

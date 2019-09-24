@@ -27,6 +27,12 @@ extern "C" {
 
 /* GLOBAL VARIABLES --------------------------------------------------------- */
 
+/* TYPEDEFS ----------------------------------------------------------------- */
+
+/* MACROS  ------------------------------------------------------------------ */
+#define CPU_F	((double)8000000)
+#define	delay_us(us)  __delay_cycles((long)(CPU_F * (double)us / 1000000.0))   //__delay_cycles(1): delay time = 1 system clock.
+#define	delay_ms(ms)  __delay_cycles((long)(CPU_F * (double)ms / 1000.0))
 
 /* Private defines -----------------------------------------------------------*/
 #define HDC1080_ADDR		0x80	/* HDC1080 IIC地址 */
@@ -46,6 +52,7 @@ extern "C" {
 
 #define IIC_Sda_In()  		   /* iic sda引脚设置为输入模式 */
 #define IIC_SdaOut()		   /* iic sda引脚设置为输出模式 */
+
 /* GLOBAL FUNCTIONS --------------------------------------------------------- */
 
 
