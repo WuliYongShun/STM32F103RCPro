@@ -1,10 +1,3 @@
-/*
- * HDC1080.c
- *
- *  Created on: 2019年9月17日
- *      Author: S
- */
-
 /**
   ******************************************************************************
   *               Copyright(C) 2018-2028 GDKY All Rights Reserved
@@ -47,9 +40,6 @@ static uint8_t s_u8HumidityVal = 0;//湿度值，单位：%， 1-100.
 
 
 
-
-
-
 /**
  * @brief  HDC1080us延时函数
  * @param[in]  time:延时周期数
@@ -88,16 +78,6 @@ static void IIC_Init(void)
 
 }
 
-/**
- * @brief  HDC1080初始化
- * @param  None
- * @return None
- */
-uint8_t HDC1080_Init(void)
-{
-	/* iic初始化 */
-	IIC_Init();
-}
 
 /**
  * @brief  IIC START
@@ -281,6 +261,17 @@ uint8_t IIC_ReadByte(uint8_t ack)
 }
 
 /**
+ * @brief  HDC1080初始化
+ * @param  None
+ * @return None
+ */
+void HDC1080_Init(void)
+{
+	/* iic初始化 */
+	IIC_Init();
+}
+
+/**
  * @brief  在HDC1080指定地址写入一个数据
  * @param[in]  WriteAddr  :写入数据的目的地址
  * @param[in]  DataToWrite:要写入的数据
@@ -366,7 +357,6 @@ uint32_t HDC1080_ReadByte(uint8_t DevAddr, uint8_t RegAddr)
  */
 void HDC1080_UpdateTemperature(void)
 {
-    float f_temperture;
 	uint32_t temperature;	//温度
 
 	temperature = HDC1080_ReadByte(DEVICE_ADDR, TEMPTURE_ADDR);
@@ -395,7 +385,7 @@ void HDC1080_UpdateTemperature(void)
 }
 
 /**
- * @brief  update temperature
+ * @brief  update Humidity
  * @param  None
  * @return None
  */
@@ -416,4 +406,24 @@ void HDC1080_UpdateHumdity(void)
 		f_humidity = (float)humidity;
 		s_u8HumidityVal = (uint8_t)(f_humidity / 0xffff * 100);	//计算湿度值
 	}
+}
+
+/**
+ * @brief  Get temperature
+ * @param  None
+ * @return None
+ */
+int16_t Get_HDC1080Tempture(void)
+{
+	return s_i16TempVal;	//返回温度值
+}
+
+/**
+ * @brief  Get Humidity
+ * @param  None
+ * @return None
+ */
+uint8_t Get_Humidity(void)
+{
+	return s_u8HumidityVal;		//返回湿度值
 }

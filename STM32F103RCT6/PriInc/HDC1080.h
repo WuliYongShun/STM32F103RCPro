@@ -26,6 +26,7 @@ extern "C" {
 
 /* MACROS  ------------------------------------------------------------------ */
 
+/* msp430时钟配置 */
 #define CPU_F	((double)8000000)
 #define	delay_us(us)  __delay_cycles((long)(CPU_F * (double)us / 1000000.0))   //__delay_cycles(1): delay time = 1 system clock.
 #define	delay_ms(ms)  __delay_cycles((long)(CPU_F * (double)ms / 1000.0))
@@ -54,6 +55,14 @@ extern "C" {
 /* GLOBAL VARIABLES --------------------------------------------------------- */
 
 /* GLOBAL FUNCTIONS --------------------------------------------------------- */
+
+void HDC1080_Init(void);				//初始化HDC1080
+
+void HDC1080_UpdateTemperature(void);	//更新传感器温度
+void HDC1080_UpdateHumdity(void);		//更新传感器湿度
+
+int16_t Get_HDC1080Tempture(void);		//获取HDC1080传感器温度并返回
+uint8_t Get_Humidity(void);				//获取HDC1080传感器湿度并返回
 
 /* LOCAL VARIABLES ---------------------------------------------------------- */
 
